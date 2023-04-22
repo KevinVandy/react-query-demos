@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   MantineProvider,
   type ColorScheme,
   ColorSchemeProvider,
 } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AppRoutes } from "./AppRoutes";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -13,7 +12,11 @@ const queryClient = new QueryClient({
   },
 });
 
-export const App = () => {
+interface Props {
+  children: ReactNode;
+}
+
+export const AppProviders = ({ children }: Props) => {
   const [colorScheme, setColorScheme] = useState<ColorScheme>("light");
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
@@ -29,7 +32,7 @@ export const App = () => {
           withGlobalStyles
           withNormalizeCSS
         >
-          <AppRoutes />
+          {children}
         </MantineProvider>
       </ColorSchemeProvider>
     </QueryClientProvider>

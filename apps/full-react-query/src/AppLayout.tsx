@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { type ReactNode } from "react";
 import {
   ActionIcon,
   AppShell,
@@ -9,15 +9,13 @@ import {
 } from "@mantine/core";
 import { IconMoonStars, IconSun } from "@tabler/icons-react";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <div>Home</div>,
-  },
-]);
+interface Props {
+  children: ReactNode;
+}
 
-export const AppRoutes = () => {
+export const AppLayout = ({ children }: Props) => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  
   return (
     <AppShell
       padding="md"
@@ -56,7 +54,7 @@ export const AppRoutes = () => {
         },
       })}
     >
-      <RouterProvider router={router} />
+      {children}
     </AppShell>
   );
 };
