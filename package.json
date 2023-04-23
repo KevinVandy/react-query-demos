@@ -4,6 +4,8 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "no-query:dev": "turbo run dev --filter no-react-query-demo",
+    "query:dev": "turbo run dev --filter full-react-query-demo",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
