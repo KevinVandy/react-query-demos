@@ -1,10 +1,12 @@
-import { useParams } from 'react-router-dom';
+import { useCallback, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { useFetchPost } from '../hooks/useFetchPost';
 import { useFetchComments } from '../hooks/useFetchComments';
 import {
   ActionIcon,
   Alert,
   Box,
+  Button,
   Card,
   Collapse,
   Flex,
@@ -12,18 +14,31 @@ import {
   Skeleton,
   Stack,
   Text,
+  Textarea,
   Title,
   Tooltip,
 } from '@mantine/core';
 import { IconAlertCircle, IconRefresh } from '@tabler/icons-react';
+import { useFetchUser } from '../hooks/useFetchUser';
+import { usePostComment } from '../hooks/usePostComment';
+import { IComment } from '../types/api-types';
 
 export const PostPage = () => {
   const { id: postId } = useParams();
+
+  //load post
   const {
     data: post,
     isLoading: isLoadingPost,
     isError: isErrorLoadingPosts,
   } = useFetchPost(postId as string);
+
+  //load user
+  const { data: user, isLoading: isLoadingUser } = useFetchUser(
+    post?.userId as string | undefined,
+  );
+
+  //load comments
   const {
     data: comments,
     isLoading: isLoadingComments,
@@ -31,6 +46,23 @@ export const PostPage = () => {
     isError: isErrorLoadingComments,
     refetch: refetchComments,
   } = useFetchComments(postId as string);
+
+  // Post comment stuff
+  const [commentText, setCommentText] = useState('');
+
+  const { mutateAsync: postComment, isLoading: isPostingComment } =
+    usePostComment();
+
+  const handleSubmitComment = useCallback(async () => {
+    const newComment: Omit<IComment, 'id'> = {
+      body: commentText,
+      email: 'user@mailinator.com',
+      name: 'User',
+      postId: Number(postId),
+    };
+    await postComment(newComment);
+    setCommentText('');
+  }, [commentText, postId, postComment]);
 
   return (
     <Stack>
@@ -43,21 +75,33 @@ export const PostPage = () => {
           >
             There was an error loading this post
           </Alert>
-        ) : isLoadingPost ? (
+        ) : isLoadingPost || isLoadingUser ? (
           <>
             <Skeleton animate height="20px" width="50%" mb="md" />
             <Skeleton animate height="40px" width="100%" mb="md" />
           </>
         ) : (
           <>
+            <Title order={1}>Post: {post?.id}</Title>
             <Title order={2}>{post?.title}</Title>
-            <Text>{post.body}</Text>
+            <Title order={3}>
+              By:{' '}
+              <Link
+                to={`/users/${user?.id}`}
+                style={{ textDecoration: 'none' }}
+              >
+                {user?.name}
+              </Link>
+            </Title>
+            <Text my="lg">
+              {post.body}. {post.body}. {post.body}. {post.body}. {post.body}.
+            </Text>
           </>
         )}
       </Box>
       <Flex justify="space-between" align="center">
         <Title mt="lg" order={3}>
-          Comments
+          Comments on this Post
         </Title>
         <Tooltip withArrow label="Refresh Comments">
           <ActionIcon onClick={() => refetchComments()}>
@@ -96,6 +140,28 @@ export const PostPage = () => {
             </Card>
           ))
         )}
+        <Textarea
+          disabled={isPostingComment}
+          label="Post a Comment"
+          onChange={(e) => setCommentText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSubmitComment();
+            }
+          }}
+          value={commentText}
+        />
+        <Button
+          disabled={isPostingComment || commentText.length === 0}
+          leftIcon={
+            isPostingComment ? (
+              <Loader variant="oval" color="white" size="xs" />
+            ) : null
+          }
+          onClick={handleSubmitComment}
+        >
+          Submit
+        </Button>
       </Stack>
     </Stack>
   );

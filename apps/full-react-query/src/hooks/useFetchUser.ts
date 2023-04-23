@@ -1,15 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
-import { type User } from '../types/api-types';
+import { type IUser } from '../types/api-types';
 
-export const useFetchUser = (id: string) => {
+export const useFetchUser = (userId?: string) => {
   return useQuery({
-    queryKey: ['user', id],
+    enabled: !!userId,
+    queryKey: ['user', userId],
     queryFn: async () => {
       const response = await fetch(
-        `https://jsonplaceholder.typicode.com/users/${id}`,
+        `https://jsonplaceholder.typicode.com/users/${userId}`,
       );
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      return response.json() as Promise<User>;
+      return response.json() as Promise<IUser>;
     },
   });
 };

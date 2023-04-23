@@ -2,14 +2,14 @@ import { useMemo } from 'react';
 import { useFetchUsers } from '../hooks/useFetchUsers';
 import { MRT_ColumnDef, MantineReactTable } from 'mantine-react-table';
 import { Anchor } from '@mantine/core';
-import { User } from '../types/api-types';
+import { IUser } from '../types/api-types';
 import { useNavigate } from 'react-router-dom';
 
 export const UsersPage = () => {
   const navigate = useNavigate();
   const { data: users = [], isLoading, isFetching, isError } = useFetchUsers();
 
-  const columns = useMemo<MRT_ColumnDef<User>[]>(
+  const columns = useMemo<MRT_ColumnDef<IUser>[]>(
     () => [
       {
         accessorKey: 'name',

@@ -27,7 +27,14 @@ export const AppLayout = ({ children }: Props) => {
         },
       })}
     >
-      <Box sx={{ maxWidth: '1400px', margin: 'auto', padding: '1rem' }}>
+      <Box
+        sx={{
+          maxWidth: '1400px',
+          margin: 'auto',
+          padding: '1rem',
+          paddingBottom: '500px',
+        }}
+      >
         <BreadCrumbs />
         {children}
       </Box>

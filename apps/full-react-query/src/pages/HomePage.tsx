@@ -23,12 +23,13 @@ export const HomePage = () => {
 
   return (
     <Stack>
+      <Title order={2}>Your Home Feed</Title>
       <Flex sx={{ width: '100%', justifyContent: 'center', minHeight: '2rem' }}>
         <Collapse in={isFetching}>
           <Loader />
         </Collapse>
       </Flex>
-      <Stack sx={{ gap: '1rem', padding: '2rem', paddingTop: 0 }}>
+      <Stack sx={{ gap: '1rem' }}>
         {isError ? (
           <Alert
             icon={<IconAlertCircle size="1rem" />}

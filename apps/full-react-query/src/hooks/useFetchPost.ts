@@ -1,15 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { type Post } from '../types/api-types';
+import { type IPost } from '../types/api-types';
 
-export const useFetchPost = (id: string) => {
+export const useFetchPost = (postId: string) => {
   return useQuery({
-    queryKey: ['post', id],
+    queryKey: ['post', postId],
     queryFn: async () => {
       const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts/${id}`,
+        `https://jsonplaceholder.typicode.com/posts/${postId}`,
       );
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      return response.json() as Promise<Post>;
+      return response.json() as Promise<IPost>;
     },
   });
 };
