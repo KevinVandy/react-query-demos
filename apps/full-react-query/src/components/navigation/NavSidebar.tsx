@@ -1,11 +1,21 @@
-import { Navbar } from "@mantine/core";
-import { NavbarLinks } from "./NavbarLinks";
+import { Navbar } from '@mantine/core';
+import { NavbarLinks } from './NavbarLinks';
 
-export const NavSidebar = () => {
+interface Props {
+  opened: boolean;
+}
+
+export const NavSidebar = ({ opened }: Props) => {
   return (
-    <Navbar width={{ base: 300 }} height={500} p="xs">
+    <Navbar
+      width={{ base: opened ? 200 : 70 }}
+      height={'100vh'}
+      p="xs"
+      sx={{ transition: 'width 200ms ease-in-out' }}
+      zIndex={4}
+    >
       <Navbar.Section grow mt="xs">
-        <NavbarLinks />
+        <NavbarLinks opened={opened} />
       </Navbar.Section>
       <Navbar.Section>{/* <User /> */}</Navbar.Section>
     </Navbar>

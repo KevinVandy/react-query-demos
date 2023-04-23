@@ -1,29 +1,34 @@
-import { type ReactNode } from "react";
-import { AppShell } from "@mantine/core";
-import { HeaderNavBar } from "./components/navigation/Header";
-import { NavSidebar } from "./components/navigation/NavSidebar";
+import { type ReactNode } from 'react';
+import { AppShell, Box } from '@mantine/core';
+import { NavbarHeader } from './components/navigation/NavbarHeader';
+import { NavSidebar } from './components/navigation/NavSidebar';
+import { useDisclosure } from '@mantine/hooks';
 
 interface Props {
   children: ReactNode;
 }
 
 export const AppLayout = ({ children }: Props) => {
+  const [opened, { toggle }] = useDisclosure(false);
+
   return (
     <AppShell
       padding="md"
-      fixed={false}
-      navbar={<NavSidebar />}
-      header={<HeaderNavBar />}
+      fixed={true}
+      navbar={<NavSidebar opened={opened} />}
+      header={<NavbarHeader opened={opened} toggle={toggle} />}
       styles={(theme) => ({
         main: {
           backgroundColor:
-            theme.colorScheme === "dark"
+            theme.colorScheme === 'dark'
               ? theme.colors.dark[8]
               : theme.colors.gray[0],
         },
       })}
     >
-      {children}
+      <Box sx={{ maxWidth: '1400px', margin: 'auto', padding: '1rem' }}>
+        {children}
+      </Box>
     </AppShell>
   );
 };

@@ -1,12 +1,13 @@
-import { useState, type ReactNode } from "react";
+import { useState, type ReactNode, useEffect } from 'react';
 import {
   MantineProvider,
   type ColorScheme,
   ColorSchemeProvider,
-} from "@mantine/core";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter } from "react-router-dom";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+} from '@mantine/core';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { theme } from './Theme';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,9 +20,15 @@ interface Props {
 }
 
 export const AppProviders = ({ children }: Props) => {
-  const [colorScheme, setColorScheme] = useState<ColorScheme>("light");
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(
+    () => (localStorage.getItem('colorScheme') as ColorScheme) || 'light',
+  );
   const toggleColorScheme = (value?: ColorScheme) =>
-    setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
+    setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
+
+  useEffect(() => {
+    localStorage.setItem('colorScheme', colorScheme);
+  }, [colorScheme]);
 
   return (
     <BrowserRouter>
@@ -31,7 +38,7 @@ export const AppProviders = ({ children }: Props) => {
           toggleColorScheme={toggleColorScheme}
         >
           <MantineProvider
-            theme={{ colorScheme: colorScheme }}
+            theme={theme(colorScheme)}
             withGlobalStyles
             withNormalizeCSS
           >
