@@ -18,19 +18,19 @@ import {
 import { IconAlertCircle, IconRefresh } from '@tabler/icons-react';
 
 export const PostPage = () => {
-  const { id } = useParams();
+  const { id: postId } = useParams();
   const {
     data: post,
     isLoading: isLoadingPost,
     isError: isErrorLoadingPosts,
-  } = useFetchPost(id as string);
+  } = useFetchPost(postId as string);
   const {
     data: comments,
     isLoading: isLoadingComments,
     isFetching: isFetchingComments,
     isError: isErrorLoadingComments,
     refetch: refetchComments,
-  } = useFetchComments(id as string);
+  } = useFetchComments(postId as string);
 
   return (
     <Stack>

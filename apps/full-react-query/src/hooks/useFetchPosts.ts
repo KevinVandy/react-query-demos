@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { type Post } from '../types/api-types';
 
-export const useFetchPosts = () => {
+export const useFetchPosts = (userId?: string) => {
   return useQuery({
-    queryKey: ['posts'],
+    queryKey: ['posts', userId],
     queryFn: async () => {
       const response = await fetch(
         `https://jsonplaceholder.typicode.com/posts`,
