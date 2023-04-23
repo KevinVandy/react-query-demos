@@ -5,6 +5,8 @@ import {
   ColorSchemeProvider,
 } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter } from "react-router-dom";
+// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,19 +24,22 @@ export const AppProviders = ({ children }: Props) => {
     setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ColorSchemeProvider
-        colorScheme={colorScheme}
-        toggleColorScheme={toggleColorScheme}
-      >
-        <MantineProvider
-          theme={{ colorScheme: colorScheme }}
-          withGlobalStyles
-          withNormalizeCSS
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <ColorSchemeProvider
+          colorScheme={colorScheme}
+          toggleColorScheme={toggleColorScheme}
         >
-          {children}
-        </MantineProvider>
-      </ColorSchemeProvider>
-    </QueryClientProvider>
+          <MantineProvider
+            theme={{ colorScheme: colorScheme }}
+            withGlobalStyles
+            withNormalizeCSS
+          >
+            {children}
+            {/* <ReactQueryDevtools /> */}
+          </MantineProvider>
+        </ColorSchemeProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
   );
 };
