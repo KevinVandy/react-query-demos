@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { useFetchUsers } from '../hooks/useFetchUsers';
 import { MRT_ColumnDef, MantineReactTable } from 'mantine-react-table';
-import { User } from '../types/api-types';
 import { Anchor } from '@mantine/core';
+import { User } from '../types/api-types';
 
 export const UsersPage = () => {
-  const { data: users = [], isLoading, isFetching } = useFetchUsers();
+  const { data: users = [], isLoading, isFetching, isError } = useFetchUsers();
 
   const columns = useMemo<MRT_ColumnDef<User>[]>(
     () => [
@@ -38,7 +38,19 @@ export const UsersPage = () => {
     <MantineReactTable
       data={users}
       columns={columns}
-      state={{ isLoading, showProgressBars: isFetching }}
+      state={{
+        isLoading,
+        showProgressBars: isFetching,
+        showAlertBanner: isError,
+      }}
+      mantineToolbarAlertBannerProps={
+        isError
+          ? {
+              color: 'red',
+              children: 'Error loading data',
+            }
+          : undefined
+      }
     />
   );
 };

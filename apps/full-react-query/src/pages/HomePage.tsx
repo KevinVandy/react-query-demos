@@ -1,4 +1,5 @@
 import {
+  Alert,
   Card,
   Collapse,
   Flex,
@@ -10,12 +11,14 @@ import {
 } from '@mantine/core';
 import { useFetchPosts } from '../hooks/useFetchPosts';
 import { Link } from 'react-router-dom';
+import { IconAlertCircle } from '@tabler/icons-react';
 
 export const HomePage = () => {
   const {
     data: posts,
-    isLoading: isLoadingPosts,
+    isError,
     isFetching,
+    isLoading: isLoadingPosts,
   } = useFetchPosts();
 
   return (
@@ -26,32 +29,42 @@ export const HomePage = () => {
         </Collapse>
       </Flex>
       <Stack sx={{ gap: '1rem', padding: '2rem', paddingTop: 0 }}>
-        {isLoadingPosts
-          ? [...Array(5)].map((_, index) => (
-              <Card key={index}>
-                <Skeleton animate height="20px" width="50%" mb="md" />
-                <Skeleton animate height="40px" width="100%" mb="md" />
-              </Card>
-            ))
-          : posts?.map((post) => (
-              <Link
-                key={post.id}
-                to={`/posts/${post.id}`}
-                style={{ textDecoration: 'none' }}
+        {isError ? (
+          <Alert
+            icon={<IconAlertCircle size="1rem" />}
+            title="Bummer!"
+            color="red"
+          >
+            There was an error fetching posts
+          </Alert>
+        ) : isLoadingPosts ? (
+          [...Array(5)].map((_, index) => (
+            <Card key={index}>
+              <Skeleton animate height="20px" width="50%" mb="md" />
+              <Skeleton animate height="40px" width="100%" mb="md" />
+            </Card>
+          ))
+        ) : (
+          posts?.map((post) => (
+            <Link
+              key={post.id}
+              to={`/posts/${post.id}`}
+              style={{ textDecoration: 'none' }}
+            >
+              <Card
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': {
+                    boxShadow: '0 0 10px 1px #555',
+                  },
+                }}
               >
-                <Card
-                  sx={{
-                    cursor: 'pointer',
-                    '&:hover': {
-                      boxShadow: '0 0 10px 1px #555',
-                    },
-                  }}
-                >
-                  <Title order={2}>{post.title}</Title>
-                  <Text>{post.body}</Text>
-                </Card>
-              </Link>
-            ))}
+                <Title order={2}>{post.title}</Title>
+                <Text>{post.body}</Text>
+              </Card>
+            </Link>
+          ))
+        )}
       </Stack>
     </Stack>
   );

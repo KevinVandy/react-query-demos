@@ -3,6 +3,7 @@ import { AppShell, Box } from '@mantine/core';
 import { NavbarHeader } from './components/navigation/NavbarHeader';
 import { NavSidebar } from './components/navigation/NavSidebar';
 import { useDisclosure } from '@mantine/hooks';
+import { BreadCrumbs } from './components/navigation/BreadCrumbs';
 
 interface Props {
   children: ReactNode;
@@ -27,6 +28,7 @@ export const AppLayout = ({ children }: Props) => {
       })}
     >
       <Box sx={{ maxWidth: '1400px', margin: 'auto', padding: '1rem' }}>
+        <BreadCrumbs />
         {children}
       </Box>
     </AppShell>
