@@ -16,8 +16,8 @@ import { IconAlertCircle } from '@tabler/icons-react';
 export const HomePage = () => {
   const {
     data: posts,
-    isError,
-    isFetching,
+    isError: isErrorLoadingPosts,
+    isFetching: isFetchingPosts,
     isLoading: isLoadingPosts,
   } = useFetchPosts();
 
@@ -25,12 +25,12 @@ export const HomePage = () => {
     <Stack>
       <Title order={2}>Your Home Feed</Title>
       <Flex sx={{ width: '100%', justifyContent: 'center', minHeight: '2rem' }}>
-        <Collapse in={isFetching}>
+        <Collapse in={isFetchingPosts}>
           <Loader />
         </Collapse>
       </Flex>
       <Stack sx={{ gap: '1rem' }}>
-        {isError ? (
+        {isErrorLoadingPosts ? (
           <Alert
             icon={<IconAlertCircle size="1rem" />}
             title="Bummer!"

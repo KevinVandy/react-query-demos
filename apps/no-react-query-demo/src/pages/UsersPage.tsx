@@ -7,7 +7,12 @@ import { useNavigate } from 'react-router-dom';
 
 export const UsersPage = () => {
   const navigate = useNavigate();
-  const { data: users = [], isLoading, isFetching, isError } = useFetchUsers();
+  const {
+    data: users = [],
+    isError: isErrorLoadingUser,
+    isFetching: isFetchingUser,
+    isLoading: isLoadingUser,
+  } = useFetchUsers();
 
   const columns = useMemo<MRT_ColumnDef<IUser>[]>(
     () => [
@@ -45,12 +50,12 @@ export const UsersPage = () => {
       data={users}
       columns={columns}
       state={{
-        isLoading,
-        showProgressBars: isFetching,
-        showAlertBanner: isError,
+        isLoading: isLoadingUser,
+        showProgressBars: isFetchingUser,
+        showAlertBanner: isErrorLoadingUser,
       }}
       mantineToolbarAlertBannerProps={
-        isError
+        isErrorLoadingUser
           ? {
               color: 'red',
               children: 'Error loading data',
