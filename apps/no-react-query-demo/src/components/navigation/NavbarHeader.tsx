@@ -21,7 +21,7 @@ export const NavbarHeader = ({ opened, toggle }: Props) => {
     <Header height={60} zIndex={4}>
       <Group sx={{ height: '100%' }} px={20} position="apart">
         <Burger opened={opened} onClick={toggle} aria-label={label} />
-        <Title order={1}>React Query Demo</Title>
+        <Title order={1}>Use Effect Demo</Title>
         <ActionIcon
           variant="default"
           onClick={() => toggleColorScheme()}

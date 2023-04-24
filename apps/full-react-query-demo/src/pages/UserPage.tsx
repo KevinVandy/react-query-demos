@@ -17,15 +17,29 @@ import { IconAlertCircle } from '@tabler/icons-react';
 
 export const UserPage = () => {
   const { id: userId } = useParams();
-  const { data: user, isLoading: isLoadingUser } = useFetchUser(
-    userId as string,
-  );
+
+  //load user
+  const {
+    data: user,
+    isLoading: isLoadingUser,
+    isError: isErrorLoadingUser,
+  } = useFetchUser(userId as string);
+
+  //load user posts
   const {
     data: posts,
     isLoading: isLoadingPosts,
     isFetching: isFetchingPosts,
     isError: isErrorLoadingPosts,
   } = useFetchPosts(userId as string);
+
+  if (isErrorLoadingUser) {
+    return (
+      <Alert title="Error loading user" icon={<IconAlertCircle />} color="red">
+        There was an error loading the user
+      </Alert>
+    );
+  }
 
   if (isLoadingUser) {
     return (

@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom';
 import { IconAlertCircle } from '@tabler/icons-react';
 
 export const HomePage = () => {
+  //load posts
   const {
     data: posts,
     isError: isErrorLoadingPosts,

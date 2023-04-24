@@ -1,6 +1,4 @@
 import { Link, useParams } from 'react-router-dom';
-import { useFetchUser } from '../hooks/useFetchUser';
-import { useFetchPosts } from '../hooks/useFetchPosts';
 import {
   Alert,
   Card,
@@ -14,18 +12,79 @@ import {
   Title,
 } from '@mantine/core';
 import { IconAlertCircle } from '@tabler/icons-react';
+import { useCallback, useEffect, useState } from 'react';
+import { IPost, IUser } from '../types/api-types';
 
 export const UserPage = () => {
   const { id: userId } = useParams();
-  const { data: user, isLoading: isLoadingUser } = useFetchUser(
-    userId as string,
-  );
-  const {
-    data: posts,
-    isLoading: isLoadingPosts,
-    isFetching: isFetchingPosts,
-    isError: isErrorLoadingPosts,
-  } = useFetchPosts(userId as string);
+
+  //user states
+  const [user, setUser] = useState<IUser | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(false);
+  const [isErrorLoadingUser, setIsErrorLoadingUser] = useState(false);
+
+  //user posts states
+  const [posts, setPosts] = useState<IPost[]>([]);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+  const [isErrorLoadingPosts, setIsErrorLoadingPosts] = useState(false);
+  const [isFetchingPosts, setIsFetchingPosts] = useState(false);
+
+  //load user
+  const fetchUser = useCallback(async () => {
+    setIsLoadingUser(true);
+    try {
+      const fetchUrl = new URL(
+        `https://jsonplaceholder.typicode.com/users/${userId}`,
+      );
+      const response = await fetch(fetchUrl.href);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate slow network
+      const fetchedUser = (await response.json()) as IUser;
+      setUser(fetchedUser);
+    } catch (error) {
+      console.error(error);
+      setIsErrorLoadingUser(true);
+    } finally {
+      setIsLoadingUser(false);
+    }
+  }, [userId]);
+
+  //load user posts
+  const fetchPosts = useCallback(async () => {
+    if (!posts.length) {
+      setIsLoadingPosts(true);
+    }
+    setIsFetchingPosts(true);
+    try {
+      const fetchUrl = new URL(
+        `https://jsonplaceholder.typicode.com/posts?userId=${userId}`,
+      );
+      const response = await fetch(fetchUrl.href);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate slow network
+      const fetchedPosts = (await response.json()) as IPost[];
+      setPosts(fetchedPosts);
+    } catch (error) {
+      console.error(error);
+      setIsErrorLoadingPosts(true);
+    } finally {
+      setIsLoadingPosts(false);
+      setIsFetchingPosts(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  //load user and user posts on mount
+  useEffect(() => {
+    fetchUser();
+    fetchPosts();
+  }, [fetchPosts, fetchUser]);
+
+  if (isErrorLoadingUser) {
+    return (
+      <Alert title="Error loading user" icon={<IconAlertCircle />} color="red">
+        There was an error loading the user
+      </Alert>
+    );
+  }
 
   if (isLoadingUser) {
     return (

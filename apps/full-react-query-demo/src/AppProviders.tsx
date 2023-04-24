@@ -1,12 +1,12 @@
 import { useState, type ReactNode, useEffect } from 'react';
 import {
   MantineProvider,
-  type ColorScheme,
   ColorSchemeProvider,
+  type ColorScheme,
 } from '@mantine/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router-dom';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { BrowserRouter } from 'react-router-dom';
 import { theme } from './Theme';
 
 const queryClient = new QueryClient({

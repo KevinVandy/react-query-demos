@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 
 export const UsersPage = () => {
   const navigate = useNavigate();
+
+  //load users
   const {
     data: users = [],
     isError: isErrorLoadingUser,

@@ -1,7 +1,5 @@
 import { useCallback, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useFetchPost } from '../hooks/useFetchPost';
-import { useFetchComments } from '../hooks/useFetchComments';
 import {
   ActionIcon,
   Alert,
@@ -19,9 +17,11 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { IconAlertCircle, IconRefresh } from '@tabler/icons-react';
+import { useFetchComments } from '../hooks/useFetchComments';
+import { useFetchPost } from '../hooks/useFetchPost';
 import { useFetchUser } from '../hooks/useFetchUser';
 import { usePostComment } from '../hooks/usePostComment';
-import { IComment } from '../types/api-types';
+import { type IComment } from '../types/api-types';
 
 export const PostPage = () => {
   const { id: postId } = useParams();
@@ -34,9 +34,11 @@ export const PostPage = () => {
   } = useFetchPost(postId as string);
 
   //load user
-  const { data: user, isLoading: isLoadingUser } = useFetchUser(
-    post?.userId as string | undefined,
-  );
+  const {
+    data: user,
+    isLoading: isLoadingUser,
+    isError: isErrorLoadingUser,
+  } = useFetchUser(post?.userId as string | undefined);
 
   //load comments
   const {
@@ -67,7 +69,7 @@ export const PostPage = () => {
   return (
     <Stack>
       <Box>
-        {isErrorLoadingPosts ? (
+        {isErrorLoadingPosts || isErrorLoadingUser ? (
           <Alert
             icon={<IconAlertCircle size="1rem" />}
             title="Bummer!"
@@ -160,7 +162,7 @@ export const PostPage = () => {
           }
           onClick={handleSubmitComment}
         >
-          Submit
+          Post Comment
         </Button>
       </Stack>
     </Stack>

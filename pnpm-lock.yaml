@@ -92,9 +92,6 @@ importers:
       '@tabler/icons-react':
         specifier: ^2.17.0
         version: 2.17.0(react@18.2.0)
-      '@tanstack/react-query':
-        specifier: ^4.29.3
-        version: 4.29.3(react-dom@18.2.0)(react@18.2.0)
       mantine-react-table:
         specifier: 1.0.0-beta.3
         version: 1.0.0-beta.3(@emotion/react@11.10.6)(@mantine/core@6.0.8)(@mantine/dates@6.0.8)(@mantine/hooks@6.0.8)(@tabler/icons-react@2.17.0)(react-dom@18.2.0)(react@18.2.0)
@@ -108,9 +105,6 @@ importers:
         specifier: ^6.10.0
         version: 6.10.0(react-dom@18.2.0)(react@18.2.0)
     devDependencies:
-      '@tanstack/react-query-devtools':
-        specifier: ^4.29.3
-        version: 4.29.3(@tanstack/react-query@4.29.3)(react-dom@18.2.0)(react@18.2.0)
       '@types/react':
         specifier: ^18.0.28
         version: 18.0.28

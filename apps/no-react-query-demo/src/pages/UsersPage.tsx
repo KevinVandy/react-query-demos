@@ -1,5 +1,4 @@
-import { useMemo } from 'react';
-import { useFetchUsers } from '../hooks/useFetchUsers';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { MRT_ColumnDef, MantineReactTable } from 'mantine-react-table';
 import { Anchor } from '@mantine/core';
 import { IUser } from '../types/api-types';
@@ -7,12 +6,36 @@ import { useNavigate } from 'react-router-dom';
 
 export const UsersPage = () => {
   const navigate = useNavigate();
-  const {
-    data: users = [],
-    isError: isErrorLoadingUser,
-    isFetching: isFetchingUser,
-    isLoading: isLoadingUser,
-  } = useFetchUsers();
+
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [isLoadingUser, setIsLoadingUser] = useState(false);
+  const [isErrorLoadingUser, setIsErrorLoadingUser] = useState(false);
+  const [isFetchingUser, setIsFetchingUser] = useState(false);
+
+  const fetchUsers = useCallback(async () => {
+    if (!users.length) {
+      setIsLoadingUser(true);
+    }
+    setIsFetchingUser(true);
+    try {
+      const fetchUrl = new URL(`https://jsonplaceholder.typicode.com/users`);
+      const response = await fetch(fetchUrl.href);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate slow network
+      const newUsers = (await response.json()) as IUser[];
+      setUsers(newUsers);
+    } catch (error) {
+      console.error(error);
+      setIsErrorLoadingUser(true);
+    } finally {
+      setIsLoadingUser(false);
+      setIsFetchingUser(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const columns = useMemo<MRT_ColumnDef<IUser>[]>(
     () => [

@@ -1,7 +1,5 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useFetchPost } from '../hooks/useFetchPost';
-import { useFetchComments } from '../hooks/useFetchComments';
 import {
   ActionIcon,
   Alert,
@@ -19,39 +17,123 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { IconAlertCircle, IconRefresh } from '@tabler/icons-react';
-import { useFetchUser } from '../hooks/useFetchUser';
-import { usePostComment } from '../hooks/usePostComment';
-import { IComment } from '../types/api-types';
+import type { IComment, IPost, IUser } from '../types/api-types';
 
 export const PostPage = () => {
   const { id: postId } = useParams();
 
+  //post states
+  const [post, setPost] = useState<IPost | null>(null);
+  const [isLoadingPost, setIsLoadingPost] = useState(false);
+  const [isErrorLoadingPosts, setIsErrorLoadingPosts] = useState(false);
+
+  //user states
+  const [user, setUser] = useState<IUser | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(false);
+  const [isErrorLoadingUser, setIsErrorLoadingUser] = useState(false);
+
+  //comments states
+  const [comments, setComments] = useState<IComment[]>([]);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const [isFetchingComments, setIsFetchingComments] = useState(false);
+  const [isErrorLoadingComments, setIsErrorLoadingComments] = useState(false);
+  const [isPostingComment, setIsPostingComment] = useState(false);
+
   //load post
-  const {
-    data: post,
-    isLoading: isLoadingPost,
-    isError: isErrorLoadingPosts,
-  } = useFetchPost(postId as string);
+  const fetchPost = useCallback(async () => {
+    setIsLoadingPost(true);
+    try {
+      const fetchUrl = new URL(
+        `https://jsonplaceholder.typicode.com/posts/${postId}`,
+      );
+      const response = await fetch(fetchUrl.href);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate slow network
+      const fetchedPost = (await response.json()) as IPost;
+      setPost(fetchedPost);
+    } catch (error) {
+      console.error(error);
+      setIsErrorLoadingPosts(true);
+    } finally {
+      setIsLoadingPost(false);
+    }
+  }, [postId]);
 
   //load user
-  const { data: user, isLoading: isLoadingUser } = useFetchUser(
-    post?.userId as string | undefined,
-  );
+  const fetchUser = useCallback(async () => {
+    if (!post?.userId) return;
+    setIsLoadingUser(true);
+    try {
+      const fetchUrl = new URL(
+        `https://jsonplaceholder.typicode.com/users/${post.userId}`,
+      );
+      const response = await fetch(fetchUrl.href);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate slow network
+      const fetchedUser = (await response.json()) as IUser;
+      setUser(fetchedUser);
+    } catch (error) {
+      console.error(error);
+      setIsErrorLoadingUser(true);
+    } finally {
+      setIsLoadingUser(false);
+    }
+  }, [post?.userId]);
 
   //load comments
-  const {
-    data: comments,
-    isLoading: isLoadingComments,
-    isFetching: isFetchingComments,
-    isError: isErrorLoadingComments,
-    refetch: refetchComments,
-  } = useFetchComments(postId as string);
+  const fetchComments = useCallback(async () => {
+    setIsLoadingComments(true);
+    setIsFetchingComments(true);
+    try {
+      const fetchUrl = new URL(
+        `https://jsonplaceholder.typicode.com/posts/${postId}/comments`,
+      );
+      const response = await fetch(fetchUrl.href);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate slow network
+      const fetchedComments = (await response.json()) as IComment[];
+      setComments(fetchedComments);
+    } catch (error) {
+      console.error(error);
+      setIsErrorLoadingComments(true);
+    } finally {
+      setIsLoadingComments(false);
+      setIsFetchingComments(false);
+    }
+  }, [postId]);
+
+  //load post, user, and comments on mount
+  useEffect(() => {
+    fetchPost();
+    fetchUser();
+    fetchComments();
+  }, [fetchPost, fetchUser, fetchComments]);
 
   // Post comment stuff
   const [commentText, setCommentText] = useState('');
 
-  const { mutateAsync: postComment, isLoading: isPostingComment } =
-    usePostComment();
+  const postComment = useCallback(
+    async (newComment: Omit<IComment, 'id'>) => {
+      setIsPostingComment(true);
+      try {
+        const fetchUrl = new URL(
+          `https://jsonplaceholder.typicode.com/posts/${postId}/comments`,
+        );
+        const response = await fetch(fetchUrl.href, {
+          method: 'POST',
+          body: JSON.stringify(newComment),
+          headers: {
+            'Content-type': 'application/json; charset=UTF-8',
+          },
+        });
+        const postedComment = (await response.json()) as IComment;
+        // Optimistically update the comments client-side
+        setComments((prev) => [...prev, postedComment]);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsPostingComment(false);
+      }
+    },
+    [postId],
+  );
 
   const handleSubmitComment = useCallback(async () => {
     const newComment: Omit<IComment, 'id'> = {
@@ -67,7 +149,7 @@ export const PostPage = () => {
   return (
     <Stack>
       <Box>
-        {isErrorLoadingPosts ? (
+        {isErrorLoadingPosts || isErrorLoadingUser ? (
           <Alert
             icon={<IconAlertCircle size="1rem" />}
             title="Bummer!"
@@ -75,7 +157,7 @@ export const PostPage = () => {
           >
             There was an error loading this post
           </Alert>
-        ) : isLoadingPost || isLoadingUser ? (
+        ) : !post || isLoadingPost || isLoadingUser ? (
           <>
             <Skeleton animate height="20px" width="50%" mb="md" />
             <Skeleton animate height="40px" width="100%" mb="md" />
@@ -104,7 +186,7 @@ export const PostPage = () => {
           Comments on this Post
         </Title>
         <Tooltip withArrow label="Refresh Comments">
-          <ActionIcon onClick={() => refetchComments()}>
+          <ActionIcon onClick={() => fetchComments()}>
             <IconRefresh />
           </ActionIcon>
         </Tooltip>
@@ -160,7 +242,7 @@ export const PostPage = () => {
           }
           onClick={handleSubmitComment}
         >
-          Submit
+          Post Comment
         </Button>
       </Stack>
     </Stack>

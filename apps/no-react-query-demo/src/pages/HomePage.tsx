@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
   Card,
@@ -9,17 +10,43 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { useFetchPosts } from '../hooks/useFetchPosts';
 import { Link } from 'react-router-dom';
 import { IconAlertCircle } from '@tabler/icons-react';
+import { IPost } from '../types/api-types';
 
 export const HomePage = () => {
-  const {
-    data: posts,
-    isError: isErrorLoadingPosts,
-    isFetching: isFetchingPosts,
-    isLoading: isLoadingPosts,
-  } = useFetchPosts();
+  //posts states
+  const [posts, setPosts] = useState<IPost[]>([]);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+  const [isErrorLoadingPosts, setIsErrorLoadingPosts] = useState(false);
+  const [isFetchingPosts, setIsFetchingPosts] = useState(false);
+
+  //load posts
+  const fetchPosts = useCallback(async () => {
+    if (!posts.length) {
+      setIsLoadingPosts(true);
+    }
+    setIsFetchingPosts(true);
+    try {
+      const fetchUrl = new URL(`https://jsonplaceholder.typicode.com/posts`);
+      const response = await fetch(fetchUrl.href);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate slow network
+      const fetchedPosts = (await response.json()) as IPost[];
+      setPosts(fetchedPosts);
+    } catch (error) {
+      console.error(error);
+      setIsErrorLoadingPosts(true);
+    } finally {
+      setIsLoadingPosts(false);
+      setIsFetchingPosts(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  //load posts on mount
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
   return (
     <Stack>
