@@ -25,3 +25,7 @@ pnpm dev
 The useEffect demo will open on localhost:5001
 
 The React Query demo will open on localhost:5002
+
+### Code
+
+View code differences in the `pages` directories of each app. The react-query app has an additional `hooks` folder to store the react-query hooks
