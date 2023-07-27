@@ -87,7 +87,7 @@ export const HomePage = () => {
                   },
                 }}
               >
-                <Title order={2}>{post.title}</Title>
+                <Title order={3}>{post.title}</Title>
                 <Text>{post.body}</Text>
               </Card>
             </Link>
